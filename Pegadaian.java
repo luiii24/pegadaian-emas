@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.mavenproject2;
 
 import java.text.NumberFormat;
@@ -11,13 +7,24 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
+
 /**
- *
- * @author THINKPAD L13 YOGA
+ * Kelas yang menangani logika bisnis dan operasional utama Pegadaian.
+ * 
+ * @author lui
  */
 class Pegadaian {
+    
+    /**
+     * Memproses penerimaan barang gadai dari nasabah dan menghasilkan kontrak transaksi baru.
+     * 
+     * @param nasabah Objek Nasabah yang melakukan pengajuan gadai.
+     * @param emas Objek Emas yang dijadikan jaminan.
+     * @param lamaAngsuran Durasi tenor pinjaman dalam satuan bulan (hanya menerima 3, 6, atau 12).
+     * @return Objek TransaksiGadai yang berisi seluruh rincian pembiayaan.
+     * @throws IllegalArgumentException Jika tenor angsuran yang dimasukkan tidak sesuai (bukan 3, 6, atau 12 bulan).
+     */
     public TransaksiGadai terimaGadai(Nasabah nasabah, Emas emas, int lamaAngsuran) {
-        // PERUBAHAN: Lempar error agar bisa ditangkap form GUI
         if (lamaAngsuran != 3 && lamaAngsuran != 6 && lamaAngsuran != 12) {
             throw new IllegalArgumentException("Pilihan angsuran tidak valid. Hanya tersedia tenor 3, 6, atau 12 bulan.");
         }

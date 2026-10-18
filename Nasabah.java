@@ -1,27 +1,47 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.mavenproject2;
 
 /**
- *
- * @author THINKPAD L13 YOGA
+ * Merepresentasikan entitas Nasabah dalam sistem pegadaian.
+ * Kelas ini menyimpan informasi dasar mengenai identitas dan kontak nasabah.
+ * 
+ * @author lui
  */
 class Nasabah {
     private String nik;
     private String nama;
     private String noHp;
 
+    /**
+     * Konstruktor untuk membuat objek Nasabah baru.
+     * 
+     * @param nik Nomor Induk Kependudukan (KTP) nasabah.
+     * @param nama Nama lengkap nasabah.
+     * @param noHp Nomor handphone atau WhatsApp nasabah yang dapat dihubungi.
+     */
     public Nasabah(String nik, String nama, String noHp) {
         this.nik = nik;
         this.nama = nama;
         this.noHp = noHp;
     }
 
+    /**
+     * Mengambil nama lengkap nasabah.
+     * 
+     * @return Nama nasabah.
+     */
     public String getNama() { return nama; }
-    // TAMBAHAN UNTUK GUI:
+    
+    /**
+     * Mengambil NIK nasabah.
+     * 
+     * @return NIK nasabah.
+     */
     public String getNik() { return nik; }
+    
+    /**
+     * Mengambil nomor handphone nasabah.
+     * 
+     * @return Nomor HP nasabah.
+     */
     public String getNoHp() { return noHp; }
 }
-
