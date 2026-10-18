@@ -25,29 +25,33 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 
+/**
+ * Kelas utama (Main Class) JavaFX yang menyediakan Antarmuka Pengguna (GUI)
+ * untuk Sistem Pegadaian Emas. Menangani navigasi tabel nasabah, pendaftaran, dan pengelolaan transaksi gadai.
+ */
 public class App extends Application {
 
     private Pegadaian pegadaian = new Pegadaian();
     
-    // --- DATABASE ---
     private ObservableList<Nasabah> dbNasabahList = FXCollections.observableArrayList(); 
     private ObservableList<TransaksiGadai> dbTransaksiList = FXCollections.observableArrayList();
 
-    // --- GUI HALAMAN UTAMA ---
     private TableView<Nasabah> tableNasabah;
     private TextField txtSearchUtama;
-    
-    // --- (Simulasi Tanggal) ---
     private DatePicker dpSimulasi = new DatePicker(LocalDate.now()); 
 
     private NumberFormat rpFormat = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
     private DateTimeFormatter df = DateTimeFormatter.ofPattern("dd MMM yyyy");
     private DateTimeFormatter dtfCetak = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss");
 
+    /**
+     * Entry point metode GUI JavaFX. Membangun halaman beranda daftar nasabah.
+     * 
+     * @param primaryStage Stage utama yang menampung komponen antarmuka.
+     */
     @Override
     public void start(Stage primaryStage) {
         
-        // --- 1. HEADER HALAMAN UTAMA ---
         HBox topBar = new HBox(15);
         topBar.setPadding(new Insets(15, 20, 15, 20));
         topBar.setStyle("-fx-background-color: #15803d;"); 
@@ -60,7 +64,6 @@ public class App extends Application {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // UI Mesin Waktu Simulasi
         Label lblSimulasi = new Label("Tanggal Sistem (Simulasi):");
         lblSimulasi.setTextFill(Color.WHITE);
         lblSimulasi.setStyle("-fx-font-weight: bold;");
@@ -77,7 +80,6 @@ public class App extends Application {
 
         topBar.getChildren().addAll(lblTitle, spacer, lblSimulasi, dpSimulasi, txtSearchUtama, btnAddUser);
 
-        // --- 2. TABEL NASABAH ---
         tableNasabah = new TableView<>();
         tableNasabah.setPlaceholder(new Label("Belum ada data nasabah. Silakan klik '+ Tambah User Baru'."));
         tableNasabah.setStyle("-fx-font-size: 14px;");
@@ -150,6 +152,11 @@ public class App extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Membuka form modal pendaftaran nasabah baru.
+     * 
+     * @param parentStage Stage induk yang mengatur fokus/modality jendela.
+     */
     private void openFormTambahUser(Stage parentStage) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL); 
@@ -202,6 +209,13 @@ public class App extends Application {
         dialog.showAndWait();
     }
 
+    /**
+     * Membuka jendela tampilan Detail Transaksi per spesifik nasabah.
+     * Menyediakan list transaksi dan form pratinjau bukti nota gadai.
+     * 
+     * @param parentStage Stage utama aplikasi.
+     * @param nasabah Entitas nasabah yang dipilih untuk melihat detailnya.
+     */
     private void openDetailTransaksiWindow(Stage parentStage, Nasabah nasabah) {
         Stage detailStage = new Stage();
         detailStage.initOwner(parentStage);
@@ -240,7 +254,6 @@ public class App extends Application {
         TableColumn<TransaksiGadai, String> colStatus = new TableColumn<>("Status");
         colStatus.setCellValueFactory(cellData -> {
             TransaksiGadai trx = cellData.getValue();
-            // Menentukan Text di Tabel berdasarkan tanggal Simulasi
             if (trx.isLunas()) return new SimpleStringProperty("LUNAS");
             if (trx.isMenunggak(dpSimulasi.getValue())) return new SimpleStringProperty("MENUNGGAK");
             return new SimpleStringProperty("AKTIF");
@@ -248,14 +261,12 @@ public class App extends Application {
 
         tableTrx.getColumns().addAll(colId, colTgl, colPinjaman, colStatus);
         
-        // Memaksa tabel refresh saat kalender diubah
         dpSimulasi.valueProperty().addListener((obs, oldVal, newVal) -> tableTrx.refresh());
 
         VBox centerBox = new VBox(tableTrx);
         centerBox.setPadding(new Insets(10));
         VBox.setVgrow(tableTrx, Priority.ALWAYS);
 
-        // --- NOTA PEMBAYARAN (KANAN) ---
         VBox rightPanel = new VBox(20);
         rightPanel.setPadding(new Insets(15));
         rightPanel.setStyle("-fx-background-color: #f8fafc;"); 
@@ -330,7 +341,6 @@ public class App extends Application {
                 outTenor.setText(newSel.getLamaAngsuran() + " Bulan");
                 outBunga.setText(newSel.getPersentaseBunga() + "%");
                 
-                // Hitung Jatuh Tempo Berikutnya
                 LocalDate jatuhTempoNext = newSel.getTanggalTransaksi().plusMonths(newSel.getBulanPembayaranKe());
                 outJatuhTempo.setText(jatuhTempoNext.format(df));
                 
@@ -349,7 +359,6 @@ public class App extends Application {
                     stampLunas.setVisible(false);
                     btnBayar.setDisable(false);
                     
-                    // Cek jika menunggak agar tombol bayar berubah warna menjadi peringatan merah
                     if (newSel.isMenunggak(dpSimulasi.getValue())) {
                         btnBayar.setStyle("-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-cursor: hand;");
                         btnBayar.setText("BAYAR TUNGGAKAN & DENDA!");
@@ -398,6 +407,13 @@ public class App extends Application {
         detailStage.show();
     }
 
+    /**
+     * Membuka form pendaftaran kontrak transaksi gadai baru (hanya terbuka dari Detail Nasabah).
+     * 
+     * @param parentStage Jendela detail transaksi nasabah.
+     * @param nasabah Nasabah yang bersangkutan.
+     * @param userTrxList List transaksi milik nasabah untuk mengecek tunggakan.
+     */
     private void openFormTambahTransaksi(Stage parentStage, Nasabah nasabah, FilteredList<TransaksiGadai> userTrxList) {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL); 
@@ -433,21 +449,19 @@ public class App extends Application {
         
         btnSimpan.setOnAction(e -> {
             try {
-                // --- VALIDASI TUNGGAKAN MENGGUNAKAN MESIN WAKTU ---
-                // Jika statusnya MENUNGGAK di kalender saat ini, maka ditolak!
                 boolean menunggak = userTrxList.stream()
                         .anyMatch(trx -> trx.isMenunggak(dpSimulasi.getValue()));
                 
                 if (menunggak) {
                     lblErrorMsg.setText("DITOLAK: Nasabah ini terdeteksi memiliki cicilan yang MENUNGGAK (Telat Bayar). Harap lunasi tunggakan terlebih dahulu!");
                     lblErrorMsg.setVisible(true);
-                    return; // Batal Simpan Transaksi
+                    return; 
                 }
 
                 Emas emas = new Emas(txtKodeEmas.getText().toUpperCase(), Double.parseDouble(txtBerat.getText()), Integer.parseInt(txtKarat.getText()));
                 TransaksiGadai trx = pegadaian.terimaGadai(nasabah, emas, cbTenor.getValue());
                 
-                dbTransaksiList.add(trx); // Masukkan ke Database Induk
+                dbTransaksiList.add(trx); 
                 dialog.close();
                 
             } catch (NumberFormatException ex) {
@@ -461,6 +475,13 @@ public class App extends Application {
         dialog.showAndWait();
     }
 
+    /**
+     * Membantu pembuatan row label dan text dinamis untuk layout struk nota secara rapi.
+     * 
+     * @param labelText Tulisan di sebelah kiri row.
+     * @param valueLabel Label node target untuk penempatan value di sebelah kanan row.
+     * @return HBox yang membungkus komponen label dengan susunan flexbox.
+     */
     private HBox createRow(String labelText, Label valueLabel) {
         HBox box = new HBox();
         Label lbl = new Label(labelText);
@@ -471,6 +492,11 @@ public class App extends Application {
         return box;
     }
 
+    /**
+     * Metode utama pembuka program Java.
+     * 
+     * @param args Parameter eksekusi argumen shell (bila ada).
+     */
     public static void main(String[] args) {
         launch(args);
     }
