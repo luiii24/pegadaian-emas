@@ -5,7 +5,7 @@ package com.mycompany.mavenproject2;
  * 
  * @author lui
  */
-class Emas {
+public class Emas {
     private String kodeBarang;
     private double berat;
     private int karat;

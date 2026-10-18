@@ -13,7 +13,7 @@ import java.util.UUID;
  * 
  * @author lui
  */
-class Pegadaian {
+public class Pegadaian {
     
     /**
      * Memproses penerimaan barang gadai dari nasabah dan menghasilkan kontrak transaksi baru.

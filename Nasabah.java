@@ -6,7 +6,7 @@ package com.mycompany.mavenproject2;
  * 
  * @author lui
  */
-class Nasabah {
+public class Nasabah {
     private String nik;
     private String nama;
     private String noHp;
